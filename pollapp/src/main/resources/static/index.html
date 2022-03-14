@@ -1,0 +1,119 @@
+<html>
+    <head>
+        <link type="text/css" rel="stylesheet" href="css/materialize.min.css"  media="screen,projection"/>
+        <link rel="stylesheet" href="css/main.css"/>
+        <link href="https://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet">
+        <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+
+        <title>Polling App</title>
+    </head>
+
+    <body class="scrollspy">
+        <header>
+            <!-- navbar -->
+            <div class="navbar-fixed">
+                <nav class="white">
+                    <div class="container">
+                        <div class="nav-wrapper">
+                            <a href="index.html" class="brand-logo indigo-text text-accent-4">Polling App</a>
+                            <ul class="right">
+                                <li>
+                                    <a href="index.html">
+                                        <i class="material-icons prefix indigo-text text-accent-4">home</i>
+                                    </a>
+                                </li>
+                                <li>
+                                    <a href="newpoll.html">
+                                        <i class="material-icons prefix indigo-text text-accent-4">equalizer</i>
+                                    </a>
+                                </li>
+                                <li>
+                                    <a class="dropdown-trigger" data-target="dropdown" href="#">
+                                        <i class="material-icons left indigo-text text-accent-4">account_circle</i>
+                                    </a>
+
+                                    <ul id="dropdown" class="dropdown-content">
+                                        <li><a href="login.html">Login</a></li>
+                                    </ul>
+                                </li>
+                            </ul>
+                        </div>
+                    </div>
+                </nav>
+            </div>
+        </header>
+
+        <main>
+            <section class="section section-content">
+                <div class="container">
+                    <div id="polls_container" class="pools-container">
+
+                    </div>
+                </div>
+            </section>
+        </main>
+
+        <footer>
+
+        </footer>
+
+        <script type="text/javascript" src="js/materialize.min.js"></script>
+        <script src="js/jquery-3.6.0-dev.js"></script>
+        <script type="text/javascript" src="js/utils.js"></script>
+        <script type="text/javascript">
+
+            // init navbar dropdown
+            initDropDown();
+
+            $(document).ready(function() {
+                var loggedIn = isLoggedIn();
+                var jwt = "";
+                if(loggedIn) {
+                    jwt = getCookie("jwt");
+
+                    var dopdownContent =
+                    `<li><a href="profile.html?user=me">Profile</a></li>
+                    <li><a href="javascript:logout()">Logout</a></li>`;
+
+                    $("#dropdown").html(dopdownContent);
+                }
+
+                $.ajax({
+                    url: "http://localhost:8080/api/polls/",
+                    type : "GET",
+                    contentType : "application/json",
+                    beforeSend: function (xhr) {
+                        if(isLoggedIn) {
+                            xhr.setRequestHeader("Authorization", "Bearer " + jwt);
+                        }
+                    },
+                    success : function(result) {
+                        for(var i = 0; i < result.size; i++) {
+                            if(result.content[i].ended == false) {
+                                if(result.content[i].selectedChoice === null) {
+                                    // active & not voted
+                                    addPollActiveNotVoted(result.content[i], loggedIn);
+                                } else {
+                                    // active & voted
+                                    addPollActiveVoted(result.content[i]);
+                                }
+                            } else {
+                                if(result.content[i].selectedChoice === null) {
+                                    // ended and not voted
+                                    addPollEndedNotVoted(result.content[i]);
+                                } else {
+                                    // ended & voted
+                                    addPollEndedVoted(result.content[i]);
+                                }
+                            }
+                        }
+                    },
+                    error : function(xhr, resp, text) {
+                        var jsonResponse = $.parseJSON(xhr.responseText);
+                        console.log(xhr.responseText);
+                    }
+                });
+            });
+        </script>
+    </body>
+</html>

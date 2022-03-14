@@ -1,0 +1,256 @@
+<html>
+    <head>
+        <link type="text/css" rel="stylesheet" href="css/materialize.min.css"  media="screen,projection"/>
+        <link rel="stylesheet" href="css/main.css"/>
+        <link href="https://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet">
+        <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+
+        <title>New Poll</title>
+    </head>
+
+    <body class="scrollspy">
+        <header>
+            <!-- navbar -->
+            <div class="navbar-fixed">
+                <nav class="white">
+                    <div class="container">
+                        <div class="nav-wrapper">
+                            <a href="index.html" class="brand-logo indigo-text text-accent-4">Polling App</a>
+                            <ul class="right">
+                                <li>
+                                    <a href="index.html">
+                                        <i class="material-icons prefix indigo-text text-accent-4">home</i>
+                                    </a>
+                                </li>
+                                <li>
+                                    <a href="newpoll.html">
+                                        <i class="material-icons prefix indigo-text text-accent-4">equalizer</i>
+                                    </a>
+                                </li>
+                                <li>
+                                    <a class="dropdown-trigger" data-target="dropdown" href="#">
+                                        <i class="material-icons left indigo-text text-accent-4">account_circle</i>
+                                    </a>
+
+                                    <ul id='dropdown' class='dropdown-content'>
+                                        <li><a href="login.html">Login</a></li>
+                                    </ul>
+                                </li>
+                            </ul>
+                        </div>
+                    </div>
+                </nav>
+            </div>
+        </header>
+
+        <main>
+            <section class="create-poll" style="margin-top:3em;">
+                <div class="container">
+                    <div class="row">
+                        <div class="col s12 m6 offset-m3">
+                            <h5>Create Poll</h5>
+                        </div>
+                    </div>
+                    <form id="new_poll_form" action="" method="post">
+                        <input type="hidden" value="2" id="num_choices">
+                        <div class="row" style="margin-bottom: 0px;">
+                            <div class="input-field col s12 m6 offset-m3">
+    							<textarea id="question" name="question" class="materialize-textarea validate"></textarea>
+                                <label for="question" data-error="Please enter a question">
+                                    Enter your question
+                                </label>
+                                <span class="helper-text" data-error="Question must be between 8 and 120 characters long"></span>
+    						</div>
+                        </div>
+                        <div class="choices">
+                            <div class="row" style="margin-bottom: 0px;">
+                                <div class="input-field col s12 m6 offset-m3">
+        							<input id="choice1" name="choice1" type="text" class="validate">
+        							<label for="choice1">Choice 1</label>
+                                    <span class="helper-text" data-error="Choice must not be empty"></span>
+        						</div>
+                            </div>
+                            <div class="row" style="margin-bottom: 0px;">
+                                <div class="input-field col s12 m6 offset-m3">
+        							<input id="choice2" name="choice2" type="text" class="validate">
+        							<label for="choice2">Choice 2</label>
+                                    <span class="helper-text" data-error="Choice must not be empty"></span>
+        						</div>
+                            </div>
+                        </div>
+                        <div class="row" style="margin-bottom: 0px;">
+    						<div class="input-field col s12 m6 offset-m3">
+                                <a class="waves-effect waves-light btn-small indigo accent-4" id="add_choice" onclick="add()">
+                                    <i class="material-icons left">add</i>Add choice
+                                </a>
+    						</div>
+                        </div>
+                        <div class="row" style="margin-bottom: 0px;">
+    						<div class="input-field col s3 m2 offset-m3">
+                                <select id="poll_length_days" name="days" data-dropup-auto="false">
+                                    <option value="" disabled selected>Days</option>
+                                    <option value="1">1 day</option>
+                                </select>
+                                <label>Poll Length</label>
+                            </div>
+                            <div class="input-field col s3 m2">
+                                <select id="poll_length_hours" name="hours">
+                                    <option value="" disabled selected>Hours</option>
+                                    <option value="0">0 hours</option>
+                                    <option value="1">1 hour</option>
+                                </select>
+                            </div>
+                        </div>
+                        <div class="row" style="margin-bottom: 0px;">
+    						<div class="input-field col s6 m6 offset-m3">
+    							<button style="width:100%;" type="submit" id="create-poll-btn" class="btn btn-block waves-effect waves-light indigo accent-4">Create Poll</button>
+    						</div>
+                            <div class="col s6 m6 offset-m3 center-align">
+                                <span id="new_poll_error_msg" class="red-text text-accent-2"></span>
+                            </div>
+                        <div>
+					</form>
+                </div>
+            </section>
+        </main>
+
+        <script type="text/javascript" src="js/materialize.min.js"></script>
+        <script type="text/javascript" src="js/jquery-3.6.0-dev.js"></script>
+        <script type="text/javascript" src="js/utils.js"></script>
+        <script type="text/javascript">
+
+            // init navbar dropdown
+            initDropDown();
+
+            // init pollLength selects
+            document.addEventListener("DOMContentLoaded", function() {
+                var elems = document.querySelectorAll("select");
+                var instances = M.FormSelect.init(elems);
+            });
+
+            var select_days = "";
+            var select_hours = "";
+            for (i=2;i<=7;i++){
+                select_days += `<option value="${i}">${i} days</option>`;
+            }
+            for (i=2;i<=23;i++){
+                select_hours += `<option value="${i}">${i} hours</option>`;
+            }
+            $("#poll_length_days").append(select_days);
+            $("#poll_length_hours").append(select_hours);
+
+            // add choice input field on button click
+            function add(){
+                var new_choice_no = parseInt($('#num_choices').val())+1
+                var new_input = `
+                <div class="row" style="margin-bottom: 0px;">
+                    <div class="input-field col s12 m6 offset-m3">
+                        <input id="choice${new_choice_no}" name="choice${new_choice_no}" type="text" class="validate">
+                        <label for="choice${new_choice_no}">Choice ${new_choice_no}</label>
+                        <span class="helper-text" data-error="Choice must not be empty"></span>
+                    </div>
+                </div>
+                `;
+
+                $('.choices').append(new_input);
+                $('#num_choices').val(new_choice_no);
+
+                if(new_choice_no == 6) {
+                    $("#add_choice").addClass("disabled");
+                    return;
+                }
+            }
+
+            $(document).ready(function() {
+                var loggedIn = isLoggedIn();
+                var jwt = "";
+                if(loggedIn) {
+                    jwt = getCookie("jwt");
+
+                    var dopdownContent =
+                    `<li><a href="profile.html?user=me">Profile</a></li>
+                    <li><a href="javascript:logout()">Logout</a></li>`;
+
+                    $("#dropdown").html(dopdownContent);
+                }
+
+                $(document).on("submit", "#new_poll_form", function() {
+                    var jsonObj = {};
+                    jsonObj.question = $("#question").val();
+
+                    jsonObj.choices = [];
+
+                    for(i = 1; i <= 6; i++) {
+                        if(document.getElementById("choice" + i)) {
+                            jsonObj.choices.push({
+                                text: $("#choice" + i).val()
+                            })
+                        }
+                    }
+
+                    jsonObj.pollLength = {
+                        days: $("#poll_length_days").val(),
+                        hours: $("#poll_length_hours").val()
+                    }
+
+                    var form_data = JSON.stringify(jsonObj);
+
+                    var jwt = getCookie("jwt");
+
+                    $.ajax({
+                        url: "http://localhost:8080/api/polls/",
+                        type : "POST",
+                        contentType : "application/json",
+                        beforeSend: function (xhr) {
+                            xhr.setRequestHeader("Authorization", "Bearer " + jwt);
+                        },
+                        data : form_data,
+                        success : function(result) {
+                            M.toast({html: "Poll Created!"})
+                            $('#new_poll_form').trigger("reset");
+                            return true;
+                        },
+                        error : function(xhr, resp, text) {
+                            var jsonResponse = $.parseJSON(xhr.responseText);
+
+                            if(jsonResponse.status == "UNAUTHORIZED") {
+                                showLoginPage();
+                                return false;
+                            }
+
+                            if(jsonResponse.errors == null) {
+                                M.toast({html: "Something went wrong!"})
+                                return false;
+                            }
+
+                            for(const error of jsonResponse.errors) {
+                                if(error.startsWith("question")) {
+                                    $("#question").addClass("invalid");
+                                } else if(error.startsWith("choices[0]")) {
+                                    $("#choice1").addClass("invalid");
+                                }
+                                else if(error.startsWith("choices[1]")) {
+                                    $("#choice2").addClass("invalid");
+                                }
+                                else if(error.startsWith("choices[2]")) {
+                                    $("#choice3").addClass("invalid");
+                                }
+                                else if(error.startsWith("choices[3]")) {
+                                    $("#choice4").addClass("invalid");
+                                }
+                                else if(error.startsWith("choices[4]")) {
+                                    $("#choice5").addClass("invalid");
+                                }
+                                else if(error.startsWith("choices[5]")) {
+                                    $("#choice6").addClass("invalid");
+                                }
+                            }
+                        }
+                    });
+
+                    return false;
+                });
+            });
+        </script>
+    </body>
+</html>

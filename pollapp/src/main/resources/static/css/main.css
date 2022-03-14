@@ -1,0 +1,210 @@
+body {
+    font-family: Verdana, Arial, sans-serif;
+}
+
+.no-polls-found {
+    font-size: 20px;
+    font-align: center;
+}
+
+.input-field input[type=text]:focus + label {
+    color: #304ffe !important;
+}
+.input-field input[type=email]:focus + label {
+    color: #304ffe !important;
+}
+.input-field input[type=password]:focus + label {
+    color: #304ffe !important;
+}
+.input-field textarea:focus + label {
+    color: #304ffe !important;
+}
+
+.input-field input[type=text]:focus {
+    border-bottom: 1px solid #304ffe !important;
+    box-shadow: 0 1px 0 0 #000000 !important;
+}
+.input-field input[type=email]:focus {
+    border-bottom: 1px solid #304ffe !important;
+    box-shadow: 0 1px 0 0 #000000 !important;
+}
+.input-field textarea:focus {
+    border-bottom: 1px solid #304ffe !important;
+    box-shadow: 0 1px 0 0 #000000 !important;
+}
+.input-field input[type=textarea]:focus {
+    border-bottom: 1px solid #304ffe !important;
+    box-shadow: 0 1px 0 0 #000000 !important;
+}
+
+.dropdown-content li>a, .dropdown-content li>span {
+  color: #304ffe!important;
+}
+
+.input-field textarea.valid {
+    border-bottom: 1px solid #304ffe !important;
+    box-shadow: 0 1px 0 0 #000000 !important;
+}
+.input-field input.valid {
+    border-bottom: 1px solid #304ffe !important;
+    box-shadow: 0 1px 0 0 #000000 !important;
+}
+
+
+#profile-avatar {
+    font-family: Arial, Helvetica, sans-serif;
+    width: 9vw;
+    height: 9vw;
+    border-radius: 50%;
+    background: white;
+    font-size: 3.5vw;
+    color: #fff;
+    text-align: center;
+    line-height: 260%;
+    margin: 1.7rem 0;
+}
+
+#profile_name {
+    display: block;
+    font-size: 2vw;
+    font-weight: bold;
+    margin-bottom: 0.5rem;
+}
+
+#profile_username {
+    display: block;
+    opacity: 0.6;
+    font-style: italic;
+    font-size: 1.2vw;
+    margin-bottom: 0.5rem;
+}
+
+#profile_join_date {
+    display: block;
+    opacity: 0.6;
+}
+
+.card-header {
+    margin-left: 1vw;
+}
+
+.card-content {
+    padding-bottom: 0.4vw !important;
+}
+
+.card-profile-avatar {
+    font-family: Arial, Helvetica, sans-serif;
+    width: 3.5vw;
+    height: 3.5vw;
+    border-radius: 50%;
+    background: white;
+    font-size: 1.5vw;
+    color: #fff;
+    text-align: center;
+    line-height: 245%;
+
+}
+.card-profile-name {
+    font-style: bold;
+}
+.card-profile-username {
+    font-style: italic;
+    opacity: 0.6;
+}
+
+.card-profile-username a {
+    color: black;
+}
+
+.card-profile-username a:hover {
+    color: blue;
+}
+
+.card-datetime-created {
+    display: block;
+    opacity: 0.6;
+}
+
+.card-question {
+    font-size: 1.3vw;
+}
+
+.card-time-left {
+    opacity: 0.6;
+    margin-top: 0.35vw;
+    margin-left: 5%;
+}
+
+[type="radio"]:checked + span:after,
+[type="radio"]:checked + span:before,
+[type="radio"]:checked + span:after {
+    border: 2px solid #304ffe;
+}
+
+[type="radio"]:checked + span:after,
+[type="radio"]:checked + span:after {
+    background-color: #304ffe;
+}
+
+.card-option-div {
+    padding-top: 0.3rem;
+    padding-bottom: 0.3rem;
+}
+.card-option-span {
+    padding-left: 0.4rem;
+}
+.voted-icon {
+    vertical-align: -0.3rem;
+}
+
+@media (max-width:700px) {
+    #profile-name {
+        font-size: 4vw;
+        font-weight: bold;
+        margin-bottom: 0rem;
+    }
+    #profile-username {
+        font-size: 2.2vw;
+        margin-bottom: 0rem;
+    }
+    #profile-join-date {
+        display: block;
+        font-weight: normal;
+        font-size: 2vw;
+    }
+    #profile-avatar {
+        font-family: Arial, Helvetica, sans-serif;
+        width: 12vw;
+        height: 12vw;
+        border-radius: 50%;
+        background: white;
+        font-size: 5vw;
+        color: #fff;
+        text-align: center;
+        line-height: 240%;
+        margin: 2rem 0;
+    }
+
+    .card-header {
+        margin-left: 5vw;
+    }
+    .card-profile-avatar {
+        font-family: Arial, Helvetica, sans-serif;
+        width: 8vw;
+        height: 8vw;
+        border-radius: 50%;
+        background: white;
+        font-size: 3.5vw;
+        color: #fff;
+        text-align: center;
+        line-height: 235%;
+    }
+    .card-question {
+        font-size: 2.8vw;
+    }
+    .card-time-left {
+        margin-top: 1.9vw;
+        font-size: 2vw;
+        margin-left: auto;
+    }
+}

@@ -1,0 +1,141 @@
+<html>
+    <head>
+        <link type="text/css" rel="stylesheet" href="css/materialize.min.css"  media="screen,projection"/>
+        <link rel="stylesheet" href="css/main.css"/>
+        <link href="https://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet">
+        <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+
+        <title>Sign Up</title>
+    </head>
+
+    <body class="scrollspy">
+        <header>
+            <!-- navbar -->
+            <div class="navbar-fixed">
+                <nav class="white">
+                    <div class="container">
+                        <div class="nav-wrapper">
+                            <a href="index.html" class="brand-logo indigo-text text-accent-4">Polling App</a>
+                            <ul class="right">
+                                <li>
+                                    <a href="login.html" class="black-text">Login</a>
+                                </li>
+                            </ul>
+                        </div>
+                    </div>
+                </nav>
+            </div>
+        </header>
+
+        <main>
+            <section class="signup" style="margin-top:3em;">
+                <div class="container">
+                    <div class="row">
+                        <div class="col s12 m4 offset-m4">
+                            <h5>Sign Up</h5>
+                        </div>
+                    </div>
+                    <form id="signup_form" action="" method="post">
+                        <div class="row" style="margin-bottom: 0px;">
+                            <div class="input-field col s12 m4 offset-m4">
+    							<input id="fullname" name="name" type="text" class="validate">
+    							<label for="fullname" data-error="Please enter your full name.">Full Name</label>
+                                <span class="helper-text" data-error="Name must be at least 4 characters"></span>
+    						</div>
+                        </div>
+                        <div class="row" style="margin-bottom: 0px;">
+                            <div class="input-field col s12 m4 offset-m4">
+    							<input id="username" name="username" type="text" class="validate">
+    							<label for="username" data-error="Please enter a username.">Username</label>
+                                <span class="helper-text" data-error="Username must be at least 4 characters"></span>
+    						</div>
+                        </div>
+                        <div class="row" style="margin-bottom: 0px;">
+    						<div class="input-field col s12 m4 offset-m4">
+    							<input id="email" name="email" type="email" class="validate">
+    							<label for="email" data-error="Please enter your email.">Email</label>
+                                <span class="helper-text" data-error="Invalid Email address"></span>
+    						</div>
+                        </div>
+                        <div class="row" style="margin-bottom: 0px;">
+    						<div class="input-field col s12 m4 offset-m4">
+    							<input id="password" name="password" type="password" class="validate">
+    							<label for="password">Password</label>
+                                <span class="helper-text" data-error="Password must be at least 8 characters"></span>
+    						</div>
+                        </div>
+                        <div class="row" style="margin-bottom: 0px;">
+    						<div class="input-field col s6 m4 offset-m4">
+    							<button style="width:100%;" type="submit" id="signup-btn" class="btn btn-block waves-effect waves-light indigo accent-4">Create Account</button>
+    						</div>
+                            <div class="col s6 m4 offset-m4 center-align">
+                                <span id="signup_error_msg" class="red-text text-accent-2"></span>
+                            </div>
+                        <div>
+					</form>
+                </div>
+            </section>
+        </main>
+
+        <script type="text/javascript" src="js/materialize.min.js"></script>
+        <script src="js/jquery-3.6.0-dev.js"></script>
+        <script type="text/javascript" src="js/utils.js"></script>
+        <script type="text/javascript">
+            $(document).ready(function() {
+
+                $(document).on("submit", "#signup_form", function() {
+                    var login_form = $(this);
+                    var form_data = JSON.stringify($('form').serializeObject());
+
+                    $.ajax({
+                        url: "http://localhost:8080/api/auth/signup",
+                        type : "POST",
+                        contentType : "application/json",
+                        data : form_data,
+                        success : function(result) {
+                            showLoginPage();
+                        },
+                        error : function(xhr, resp, text) {
+                            var jsonResponse = $.parseJSON(xhr.responseText);
+
+                            if(jsonResponse.errors == null) {
+                                $("#signup_error_msg").html(jsonResponse.message);
+                                return false;
+                            }
+                            for(const error of jsonResponse.errors) {
+                                if(error.startsWith("name")) {
+                                    $("#fullname").addClass("invalid");
+                                } else if(error.startsWith("email")) {
+                                    $("#email").addClass("invalid");
+                                }
+                                else if(error.startsWith("password")) {
+                                    $("#password").addClass("invalid");
+                                } else if(error.startsWith("username")) {
+                                    $("#username").addClass("invalid");
+                                }
+                            }
+                        }
+                    });
+
+                    return false;
+                });
+            });
+
+            $.fn.serializeObject = function() {
+                var o = {};
+                var a = this.serializeArray();
+                $.each(a, function() {
+                    if (o[this.name] !== undefined) {
+                        if (!o[this.name].push) {
+                            o[this.name] = [o[this.name]];
+                        }
+                        o[this.name].push(this.value || '');
+                    } else {
+                        o[this.name] = this.value || '';
+                    }
+                });
+                return o;
+            };
+        </script>
+    </body>
+</html>

@@ -1,0 +1,112 @@
+<html>
+    <head>
+        <link type="text/css" rel="stylesheet" href="css/materialize.min.css"  media="screen,projection"/>
+        <link rel="stylesheet" href="css/main.css"/>
+        <link href="https://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet">
+        <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+
+        <title>Login</title>
+    </head>
+
+    <body class="scrollspy">
+        <header>
+            <!-- navbar -->
+            <div class="navbar-fixed">
+                <nav class="white">
+                    <div class="container">
+                        <div class="nav-wrapper">
+                            <a href="index.html" class="brand-logo indigo-text text-accent-4">Polling App</a>
+                            <ul class="right">
+                                <li>
+                                    <a href="signup.html" class="black-text">Sign up</a>
+                                </li>
+                            </ul>
+                        </div>
+                    </div>
+                </nav>
+            </div>
+        </header>
+
+        <main>
+            <section class="login-form" style="margin-top:3em;">
+                <div class="container">
+                    <form id="login_form" action="" method="post">
+                        <div class="row" style="margin-bottom: 0px;">
+    						<div class="input-field col s12 m4 offset-m4">
+    							<i class="material-icons prefix indigo-text text-accent-4">account_circle</i>
+    							<input id="username_or_email" name="usernameOrEmail" type="text">
+    							<label for="username_or_email" data-error="Please enter your username or email.">Username or Email</label>
+                                <span class="helper-text" data-error="Invalid Email address"></span>
+    						</div>
+                        </div>
+                        <div class="row" style="margin-bottom: 0px;">
+    						<div class="input-field col s12 m4 offset-m4">
+    							<i class="material-icons prefix indigo-text text-accent-4">lock</i>
+    							<input id="password" name="password" type="password">
+    							<label for="password">Password</label>
+    						</div>
+                        </div>
+                        <div class="row" style="margin-bottom: 0px;">
+    						<div class="input-field col s6 m4 offset-m4">
+    							<button style="width:100%;" type="submit" id="login-btn" class="btn btn-block waves-effect waves-light indigo accent-4">Login</button>
+    						</div>
+                            <div class="col s6 m4 offset-m4 center-align">
+                                <span id="login_error_msg" class="red-text text-accent-4"></span>
+                            </div>
+                        <div>
+					</form>
+                </div>
+            </section>
+        </main>
+
+        <script type="text/javascript" src="js/materialize.min.js"></script>
+        <script src="js/jquery-3.6.0-dev.js"></script>
+        <script type="text/javascript" src="js/utils.js"></script>
+        <script type="text/javascript">
+            $(document).ready(function() {
+                showHomePage();
+
+                $(document).on("submit", "#login_form", function() {
+                    var login_form = $(this);
+                    var form_data = JSON.stringify($('form').serializeObject());
+
+                    $.ajax({
+                        url: "http://localhost:8080/api/auth/login",
+                        type : "POST",
+                        contentType : "application/json",
+                        data : form_data,
+                        success : function(result) {
+                            setCookie("jwt", result.jwt, 1);
+
+                            showHomePage();
+
+                        },
+                        error : function(xhr, resp, text) {
+                            login_form.find('input').val('');
+                            var jsonResponse = $.parseJSON(xhr.responseText);
+                            $("#login_error_msg").html(jsonResponse.errors);
+                        }
+                    });
+
+                    return false;
+                });
+            });
+
+            $.fn.serializeObject = function() {
+                var o = {};
+                var a = this.serializeArray();
+                $.each(a, function() {
+                    if (o[this.name] !== undefined) {
+                        if (!o[this.name].push) {
+                            o[this.name] = [o[this.name]];
+                        }
+                        o[this.name].push(this.value || '');
+                    } else {
+                        o[this.name] = this.value || '';
+                    }
+                });
+                return o;
+            };
+        </script>
+    </body>
+</html>

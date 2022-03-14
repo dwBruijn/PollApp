@@ -1,0 +1,215 @@
+<html>
+    <head>
+        <!-- import materialize.css-->
+        <link type="text/css" rel="stylesheet" href="css/materialize.min.css"  media="screen,projection"/>
+        <link rel="stylesheet" href="css/main.css"/>
+        <link href="https://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet">
+        <!-- let browser know website is optimized for mobile-->
+        <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+
+        <title>Polling App</title>
+    </head>
+
+    <body class="scrollspy">
+        <header>
+            <!-- navbar -->
+            <div class="navbar-fixed">
+                <nav class="white">
+                    <div class="container">
+                        <div class="nav-wrapper">
+                            <a href="index.html" class="brand-logo indigo-text text-accent-4">Polling App</a>
+                            <ul class="right">
+                                <li>
+                                    <a href="index.html">
+                                        <i class="material-icons prefix indigo-text text-accent-4">home</i>
+                                    </a>
+                                </li>
+                                <li>
+                                    <a href="newpoll.html">
+                                        <i class="material-icons prefix indigo-text text-accent-4">equalizer</i>
+                                    </a>
+                                </li>
+                                <li>
+                                    <a class="dropdown-trigger" data-target="dropdown" href="#">
+                                        <i class="material-icons left indigo-text text-accent-4">account_circle</i>
+                                    </a>
+
+                                    <ul id='dropdown' class='dropdown-content'>
+                                        <li><a href="login.html">Login</a></li>
+                                    </ul>
+                                </li>
+                            </ul>
+                        </div>
+                    </div>
+                </nav>
+            </div>
+        </header>
+
+        <main>
+            <section class="profile" style="margin-top: 1rem;">
+                <div class="container">
+                    <div id="user_details">
+                        <div class="row">
+                            <div class="col s2 m2 offset-s3 offset-m4">
+                                <div id="profile-avatar"></div>
+                            </div>
+                            <div class="col s4 m4" style="margin-top: 2rem; margin-left: 1rem;">
+                                <div class="profile-details">
+                                    <span id="profile_name"></span>
+                                    <span id="profile_username"></span>
+                                    <span id="profile_join_date"></span>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="divider">
+                    </div>
+                </div>
+            </section>
+            <section class="section-polls">
+                <div class="container">
+                    <div id="polls_container" class="pools-container">
+
+                    </div>
+                </div>
+            </section>
+        </main>
+
+        <script type="text/javascript" src="js/materialize.min.js"></script>
+        <script src="js/jquery-3.6.0-dev.js"></script>
+        <script type="text/javascript" src="js/utils.js"></script>
+        <script type="text/javascript">
+            initDropDown();
+
+            $(document).ready(function() {
+                var loggedIn = isLoggedIn();
+                var jwt = "";
+                if(loggedIn) {
+                    jwt = getCookie("jwt");
+
+                    var dopdownContent =
+                    `<li><a href="profile.html?user=me">Profile</a></li>
+                    <li><a href="javascript:logout()">Logout</a></li>`;
+
+                    $("#dropdown").html(dopdownContent);
+                }
+
+                // parse URL params
+                const params = new Proxy(new URLSearchParams(window.location.search), {
+                    get: (searchParams, prop) => searchParams.get(prop),
+                });
+                var userParam = params.user;
+
+                var username = userParam;
+                var name = "";
+                var userExists = false;
+
+                // get useranme for logged-in user
+                if(userParam == "me" && loggedIn) {
+                    $.ajax({
+                        url: "http://localhost:8080/api/user/me",
+                        type : "GET",
+                        contentType : "application/json",
+                        async : false,
+                        beforeSend: function (xhr) {
+                            if(isLoggedIn) {
+                                xhr.setRequestHeader("Authorization", "Bearer " + jwt);
+                            }
+                        },
+                        success : function(result) {
+                            username = result.username;
+                            name = result.name;
+                        },
+                        error : function(xhr, resp, text) {
+                            var jsonResponse = $.parseJSON(xhr.responseText);
+                            console.log(xhr.responseText);
+                        }
+                    });
+                }
+
+                // check if user exists
+                $.ajax({
+                    url: "http://localhost:8080/api/user/checkUsernameAvailability/" + username,
+                    type : "GET",
+                    contentType : "application/json",
+                    async : false,
+                    beforeSend: function (xhr) {
+                        if(isLoggedIn) {
+                            xhr.setRequestHeader("Authorization", "Bearer " + jwt);
+                        }
+                    },
+                    success : function(result) {
+                        userExists = !result.available;
+                    },
+                    error : function(xhr, resp, text) {
+                        var jsonResponse = $.parseJSON(xhr.responseText);
+                        console.log(xhr.responseText);
+                    }
+                });
+
+                if(userParam == null || userParam == "" || !userExists) {
+                    $("#user_details").html("<h5 class=\"center\">User not found</h5>");
+                    throw new Error();
+                }
+
+                // fetch user data
+                $.ajax({
+                    url: "http://localhost:8080/api/users/" + username,
+                    type : "GET",
+                    contentType : "application/json",
+                    async : false,
+                    success : function(result) {
+                        fillProfileData(result);
+                        name = result.name;
+                    },
+                    error : function(xhr, resp, text) {
+                        var jsonResponse = $.parseJSON(xhr.responseText);
+                        console.log(xhr.responseText);
+                    }
+                });
+
+                // update user avatar
+                const initial = name[0].toUpperCase();
+                document.getElementById("profile-avatar").innerHTML = "<span>"+initial+"</span>";
+                document.getElementById("profile-avatar").style.backgroundColor = CSS_COLOR_NAMES[ initial.charCodeAt() - 0x41];
+
+                // fetch user's polls
+                $.ajax({
+                    url: "http://localhost:8080/api/users/" + username + "/polls",
+                    type : "GET",
+                    contentType : "application/json",
+                    beforeSend: function (xhr) {
+                        if(isLoggedIn) {
+                            xhr.setRequestHeader("Authorization", "Bearer " + jwt);
+                        }
+                    },
+                    success : function(result) {
+                        for(var i = 0; i < result.size; i++) {
+                            if(result.content[i].ended == false) {
+                                if(result.content[i].selectedChoice === null) {
+                                    // active & not voted
+                                    addPollActiveNotVoted(result.content[i], loggedIn);
+                                } else {
+                                    // active & voted
+                                    addPollActiveVoted(result.content[i]);
+                                }
+                            } else {
+                                if(result.content[i].selectedChoice === null) {
+                                    // ended and not voted
+                                    addPollEndedNotVoted(result.content[i]);
+                                } else {
+                                    // ended & voted
+                                    addPollEndedVoted(result.content[i]);
+                                }
+                            }
+                        }
+                    },
+                    error : function(xhr, resp, text) {
+                        var jsonResponse = $.parseJSON(xhr.responseText);
+                        console.log(xhr.responseText);
+                    }
+                });
+            });
+        </script>
+    </body>
+</html>
